@@ -21,6 +21,7 @@ import webbrowser
 # Purpose 1. Applying job automation
 # Purpose 2. Gathering the 'key words' from recruitment adverisement
 
+# Still in progress.....
 
 # In[642]:
 

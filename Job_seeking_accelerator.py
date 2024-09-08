@@ -16,6 +16,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import TimeoutException
 import pandas as pd
 import os
 import webbrowser
@@ -63,9 +64,8 @@ class jobsdb_auto:
         self.driver = webdriver.Edge()
         self.driver.get(link)
     
-        #Enter the id and password to log in
-        
-        #Input data when the website is loaded
+        #Input the id and password to log in
+
         email_input = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.ID, 'emailAddress')))
         email_input.send_keys(acc_id)
         
@@ -75,11 +75,14 @@ class jobsdb_auto:
         login_button = self.driver.find_element(By.CSS_SELECTOR, 'button[data-cy="login"]')
         login_button.click()
 
-        # Wait for the loading to complete
-        WebDriverWait(self.driver, 10).until(EC.url_changes(self.driver.current_url))
-        print('Log-in completed' )
-    
-
+        try:
+            WebDriverWait(self.driver, 10).until(EC.url_changes(self.driver.current_url))
+            print ('Log-in completed' )
+            
+        #TimeoutException due to invaid email or password
+        except TimeoutException:
+            raise LogInFail()    
+        
     # Building a dataframe for job titles, company and link      
     def information(self):
         title_lst = []
@@ -105,29 +108,11 @@ class jobsdb_auto:
             
         self.df = pd.DataFrame({'Job_title':title_lst, 'Company':company_lst, 'Website':link_lst})
         return self.df
-    
-    #Opening link directly by index from dataframe
-    def open_link(self, index):
-        
-        
-        # Check the availablilty of df, if not, the df will be created
-        if not hasattr(self, 'df') or self.df.empty:
-                self.information()       
-
-        link = self.df['Website'][index]
-        webbrowser.open(link)
-        print(f"Opening link - {self.df['Website'][index]}")
-        print(f"Job title: {self.df['Job_title'][index]}")
-        print(f"Company: {self.df['Company'][index]}")
         
     #Apply job automatively    
-    def apply(self, index, resume = None, expected_salary = None):
-        
-        # Check the availablilty of df, if not, the df will be created
-        if not hasattr(self, 'df') or self.df.empty:
-            self.information()
+    def apply(self, apply_link, resume = None, expected_salary = None):
                 
-        url = self.df['Website'][index]
+        url = apply_link
         
         apply_page = requests.get(url)
         apply_soup = BeautifulSoup(apply_page.content, "html.parser")
@@ -165,9 +150,9 @@ class jobsdb_auto:
             continue_button(self)
                 
                 
-        except NoSuchElementException as e:
+        except TimeoutException as e:
             print("The application is directed to the company's own website, please apply the job by below link")
-            print(apply_url)
+            return(apply_url)
             
         if expected_salary == None:
             pass
@@ -179,13 +164,23 @@ class jobsdb_auto:
             expected_salary_select.select_by_visible_text(expected_salary)
             
         continue_button(self)
-        continue_button(self)
-        submit_button(self)
         
-        if submit_button(self):
-            print('application submitted')
-            submitted_successfully = True
-            return submitted_successfully
+        # If there are 3 pages only, it will pass to submit
+        try:
+            continue_button(self)
+        except TimeoutException:
+            pass
+        
+        try:
+            submit_button(self)
+            
+        # Detect any unfilled employer question that affect the submittion
+        except TimeoutException:
+            return submittion_fail()
+
+        return application_submitted()
+    
+
             
                     
 
@@ -205,4 +200,15 @@ def submit_button(self):
         EC.element_to_be_clickable((By.CSS_SELECTOR, 'button[data-testid="review-submit-application"]'))
     )
     button.click()
+
+class LogInFail(Exception):
+    def __init__(self, message = 'Invaild account email or password'):
+        super().__init__(message)    
+        
+def application_submitted():
+    print('Application submitted')
+    
+def submittion_fail():
+    print('Submittion fail')
+    print('Employer question(s) is not yet anwsered')
 

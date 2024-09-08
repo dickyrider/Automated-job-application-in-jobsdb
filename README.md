@@ -3,8 +3,6 @@ Table of Contents
 1.	Introduction
 2.	Features
 3.	Usage
-4.	Troubleshooting
-5.	Conclusion
 
 Introduction
 Jobsdb_auto is an process-accelerated tool designed to shorten the job application process, allowing users to apply for jobs automatically by combining the scheduling tool in window or mac. Finding a new job is not easy in today’s environment. The job market is competitive, and people are busy with their own lives. Most people don’t realize that they deserve a better job. By leveraging the power of automation, users can save time in their job searching and even receive interview invitations without any effort.
@@ -33,14 +31,6 @@ function: Defaulted to none, input the classification which can be found in jobs
 
 account_id: Jobsdb account id/email
 account_pw: Jobsdb password
-
-in progress
-
-Troubleshooting
-
-Error raising is still on progress. I will update based on the error I met.
-
-Conclusion
 
 in progress
 

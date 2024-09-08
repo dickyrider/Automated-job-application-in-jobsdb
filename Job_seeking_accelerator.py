@@ -21,6 +21,7 @@ import pandas as pd
 import os
 import webbrowser
 import time
+import notion_df
 
 
 class jobsdb_auto:
@@ -151,8 +152,8 @@ class jobsdb_auto:
                 
                 
         except TimeoutException as e:
-            print("The application is directed to the company's own website, please apply the job by below link")
-            return(apply_url)
+            print("The application is directed to the company's own website.")
+            return("Non-jobsDB application")
             
         if expected_salary == None:
             pass
@@ -164,8 +165,6 @@ class jobsdb_auto:
             expected_salary_select.select_by_visible_text(expected_salary)
             
         continue_button(self)
-        
-        # If there are 3 pages only, it will pass to submit
         try:
             continue_button(self)
         except TimeoutException:
@@ -173,8 +172,6 @@ class jobsdb_auto:
         
         try:
             submit_button(self)
-            
-        # Detect any unfilled employer question that affect the submittion
         except TimeoutException:
             return submittion_fail()
 
@@ -204,11 +201,14 @@ def submit_button(self):
 class LogInFail(Exception):
     def __init__(self, message = 'Invaild account email or password'):
         super().__init__(message)    
-        
-def application_submitted():
-    print('Application submitted')
     
 def submittion_fail():
     print('Submittion fail')
     print('Employer question(s) is not yet anwsered')
+    return('Submittion fail')
+
+def application_submitted():
+    print('Application submitted')
+    return('Application submitted')
+               
 

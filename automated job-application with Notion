@@ -6,7 +6,7 @@ api_key = #api key for Notion database
 acc_id = #email for jobsdb account
 acc_pw = #password for jobsdb account
 
-job = jobsdb_auto('Business analyst' )
+job = jobsdb_data('Business analyst' )
 job_list_df = job.information()  
 
 job.log_in(acc_id,acc_pw) 

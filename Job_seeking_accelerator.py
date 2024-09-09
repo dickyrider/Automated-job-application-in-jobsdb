@@ -24,7 +24,7 @@ import time
 import notion_df
 
 
-class jobsdb_auto:
+class jobsdb_data:
     def __init__(self, job, page = 1, function = None):
         self.job = job
         self.function = function
@@ -83,6 +83,7 @@ class jobsdb_auto:
         #TimeoutException due to invaid email or password
         except TimeoutException:
             raise LogInFail()    
+
         
     # Building a dataframe for job titles, company and link      
     def information(self):
@@ -173,7 +174,7 @@ class jobsdb_auto:
         try:
             submit_button(self)
         except TimeoutException:
-            return submittion_fail()
+            return submission_fail()
 
         return application_submitted()
     
@@ -202,13 +203,12 @@ class LogInFail(Exception):
     def __init__(self, message = 'Invaild account email or password'):
         super().__init__(message)    
     
-def submittion_fail():
-    print('Submittion fail')
+def submission_fail():
+    print('Submission fail')
     print('Employer question(s) is not yet anwsered')
-    return('Submittion fail')
+    return('Submission fail')
 
 def application_submitted():
     print('Application submitted')
     return('Application submitted')
-               
 

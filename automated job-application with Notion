@@ -13,11 +13,15 @@ job.log_in(acc_id,acc_pw)
 
 result = []
 
-for index, row in df.iterrows():
-    application = job.apply(df.loc[index]['Website'])
-    result.append(application)
+for index, row in job_list_df.iterrows():
+    if job_list_df.loc[index]['Company'] == 'Manulife (International) Limited':
+        result.append('Blacklist company')
+        pass
+    else:
+        application = job.apply(job_list_df.loc[index]['Website'])
+        result.append(application)
     
-result_df = pd.DataFrame(result,columns = ['result'])
+result_df = pd.DataFrame(result, columns = ['result'])
 application_df = pd.concat([job_list_df,result_df],axis = 1) 
 
 # If database is not yet created, please use notion_page_url to replace notion_database_url

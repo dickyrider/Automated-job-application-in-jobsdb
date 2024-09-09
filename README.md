@@ -5,6 +5,7 @@ Table of Contents
 3.	Usage
 
 Introduction
+
 Jobsdb_auto is an process-accelerated tool designed to shorten the job application process, allowing users to apply for jobs automatically by combining the scheduling tool in window or mac. Finding a new job is not easy in today’s environment. The job market is competitive, and people are busy with their own lives. Most people don’t realize that they deserve a better job. By leveraging the power of automation, users can save time in their job searching and even receive interview invitations without any effort.
 
 Features
@@ -21,16 +22,30 @@ Future upgrade:
 
 Usage
 
-•	jobsdb_auto(job, page = 1, function = None)
+•	Search the job
 
-job: Input the requirement to search (for example, business analyst, python and etc.)
-page: Defaulted to 1, input the page you want to search
-function: Defaulted to none, input the classification which can be found in jobsdb
+jobsdb_data(job, page = 1, function = None)
 
-•	log_in(account_id,account_pw)
+#job: Input the requirement to search (for example, business analyst, python and etc.)
+#function: Defaulted to none, input the classification which can be found in jobsdb
 
-account_id: Jobsdb account id/email
-account_pw: Jobsdb password
+•	Log in the JobsDB account
 
-in progress
+jobsdb_data.log_in(account_id,account_pw)
+
+•	Turn the searching result to DataFrame
+
+jobsdb_data.information()
+
+•	Apply Job automatically
+
+jobsdb_data.apply(apply_link, resume = None, expected_salary = None)
+#resume: The resume name in your account
+#expected_salary: check the employer question
+#If the application can not be processed due to unfilled employer question, the result will return to 'Submission fail'
+#If the application redirects to the employer's website, the program will not submit the application, and it will return as 'Non-jobsDB application'.
+
+
+
+
 

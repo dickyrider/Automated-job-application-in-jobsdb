@@ -68,10 +68,10 @@ class jobsdb_data:
         #Input the id and password to log in
 
         email_input = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.ID, 'emailAddress')))
-        email_input.send_keys(acc_id)
+        email_input.send_keys(account_id)
         
         pw_input = self.driver.find_element(By.ID, 'password')
-        pw_input.send_keys(acc_pw) 
+        pw_input.send_keys(account_pw) 
     
         login_button = self.driver.find_element(By.CSS_SELECTOR, 'button[data-cy="login"]')
         login_button.click()
@@ -83,7 +83,40 @@ class jobsdb_data:
         #TimeoutException due to invaid email or password
         except TimeoutException:
             raise LogInFail()    
+    
+    #Listing all the job title and total quantity of job title
+    def title(self):
+        count = 0
+        for job in self.job_titles:
+            title = job['aria-label']
+            print(title)
+            count +=1
+        return count
+    
+    #Listing all the company and total quantity of company
+    def com(self):
+        count = 0
+        
+        for job_title in self.job_titles:
+            job_company = job_title.find_next('a', {'data-automation': "jobCompany"})
+            if job_company:
+                print(job_company.text.strip())
+                count +=1
+            else:
+                print('No company name')
+                count +=1
 
+        return count
+        
+    #Listing all the link and total quantity of link
+    def web(self):
+        count = 0
+        for job in self.job_titles:
+            link = job.find_next('a', {'data-automation': "job-list-view-job-link"})
+            print(link['href'])
+            count +=1
+        return count
+    
         
     # Building a dataframe for job titles, company and link      
     def information(self):
@@ -95,6 +128,7 @@ class jobsdb_data:
         for job in self.job_titles:
             title_lst.append(job['aria-label'])
             job_company = None
+            job_link = None
             job_company = job.find_next('a', {'data-automation': "jobCompany"})
             if job_company != None:
                 company_lst.append(job_company.text.strip())
@@ -102,14 +136,14 @@ class jobsdb_data:
             # if the company name cannot be found, it is hided in the job ad
             else:
                 company_lst.append('confidential')
-            
-        for link in self.links:
-            jobsdb_url = 'https://hk.jobsdb.com'
-            website = jobsdb_url + link['href']
+            job_link = job.find_next('a', {'data-automation': "job-list-view-job-link"})
+            website = self.jobsdb_url[:-1] + job_link['href']
             link_lst.append(website)
+
             
         self.df = pd.DataFrame({'Job_title':title_lst, 'Company':company_lst, 'Website':link_lst})
         return self.df
+
         
     #Apply job automatively    
     def apply(self, apply_link, resume = None, expected_salary = None):

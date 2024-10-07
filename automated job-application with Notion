@@ -1,5 +1,7 @@
 import notion_df
 
+notion_df.pandas()
+
 notion_page_url = #Notion page link
 notion_database_url = #Notion database link
 api_key = #api key for Notion database
@@ -8,34 +10,31 @@ acc_pw = #password for jobsdb account
 
 Blacklist = [#the company you don't interested]
 
-job = jobsdb_data(#search target, e.g, business analyst )
-job_list_df = job.information()  
-
-job.log_in(acc_id,acc_pw) 
-
-result = []
-
-for num in range(1,3):
-    job = jobsdb_data('Business analyst', page = num)
-    job.log_in(acc_id,acc_pw)
-    job_list_df = job.information()
-    for index, row in job_list_df.iterrows():
-        website = job_list_df.loc[index]['Website']
-        if row['Website'] not in exist_df['Website'].tolist():
-            row_dict = row.to_dict()
-            if job_list_df.loc[index]['Company'] in blacklist:
-                result = {'Application_Date':today_date,'result':'Blacklist company'}
-            else:
-                application = job.apply(website)
-                result = {'Application_Date':today_date,'result':application}
-            row_dict.update(result)
-            applied_lst.append(row_dict)
-
+while True:
+    today = datetime.date.today()
+    today_date = today.strftime("%B %d, %Y")
+    exist_df = pd.read_notion(notion_database_url, api_key=api_key)
     
-result_df = pd.DataFrame(result, columns = ['Application_Date', 'result'])
-application_df = pd.concat([job_list_df,result_df],axis = 1) 
-
-# If database is not yet created, please use notion_page_url to replace notion_database_url
-notion_df.upload(application_df, notion_database_url, title="Job application result", api_key=api_key)
+    applied_lst = []
+    
+    for num in range(1,3):
+        job = jobsdb_data('Business analyst', page = num)
+        job.log_in(acc_id,acc_pw)
+        job_list_df = job.information()
+        for index, row in job_list_df.iterrows():
+            website = job_list_df.loc[index]['Website']
+            if row['Website'] not in exist_df['Website'].tolist():
+                row_dict = row.to_dict()
+                if job_list_df.loc[index]['Company'] in blacklist:
+                    result = {'Application_Date':today_date,'result':'Blacklist company'}
+                else:
+                    application = job.apply(website)
+                    result = {'Application_Date':today_date,'result':application}
+                row_dict.update(result)
+                applied_lst.append(row_dict)
+    
+    applied_df = pd.DataFrame(applied_lst)
+    notion_df.upload(applied_df, notion_database_url, title="Job application result", api_key=api_key)
+    # If database is not yet created, please use notion_page_url to replace notion_database_url
 
   

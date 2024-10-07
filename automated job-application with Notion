@@ -15,15 +15,21 @@ job.log_in(acc_id,acc_pw)
 
 result = []
 
-for index, row in job_list_df.iterrows():
-    today = datetime.date.today()
-    today_date = today.strftime("%B %d, %Y")
-    if job_list_df.loc[index]['Company'] in Blacklist:
-        result.append([today_date, 'Blacklist company'])
-        pass
-    else:
-        application = job.apply(job_list_df.loc[index]['Website'])
-        result.append([today_date, application])
+for num in range(1,3):
+    job = jobsdb_data('Business analyst', page = num)
+    job.log_in(acc_id,acc_pw)
+    job_list_df = job.information()
+    for index, row in job_list_df.iterrows():
+        website = job_list_df.loc[index]['Website']
+        if row['Website'] not in exist_df['Website'].tolist():
+            row_dict = row.to_dict()
+            if job_list_df.loc[index]['Company'] in blacklist:
+                result = {'Application_Date':today_date,'result':'Blacklist company'}
+            else:
+                application = job.apply(website)
+                result = {'Application_Date':today_date,'result':application}
+            row_dict.update(result)
+            applied_lst.append(row_dict)
 
     
 result_df = pd.DataFrame(result, columns = ['Application_Date', 'result'])
